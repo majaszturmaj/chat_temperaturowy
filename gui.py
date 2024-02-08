@@ -4,7 +4,13 @@ from flask import Flask, request
 import time
 import copy
 import random
-
+from pathlib import Path
+from tkinter import Tk
+from tkinter import Canvas
+from tkinter import Entry
+from tkinter import Text
+from tkinter import Button
+from tkinter import PhotoImage
 
 app = Flask(__name__)
 app.debug = False
@@ -43,7 +49,6 @@ def update_canvas():
         update_temperature(measurement, temperatures[measurement])
     calc_average_temperature()
 
-from pathlib import Path
 
 # from tkinter import *
 # Explicit imports to satisfy Flake8
