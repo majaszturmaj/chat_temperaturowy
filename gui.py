@@ -300,7 +300,7 @@ def check_temperatures():
         if len(outlier_group) != 0:
             max_temp_key = max(outlier_group, key=outlier_group.get)
             print("MAX TEMP KEY:", max_temp_key)
-            chat()
+            chat(max_temp_key)
     
 start_commands = {"1d": "test psychologiczny",
                   "b7": "quiz o informatyce",
@@ -326,7 +326,7 @@ quiz_commands = {"1d": "A",
 
 game_mode = False
 
-def chat():
+def chat(choosen_key):
     global game_mode
     print("Start update_image function in a new thread")
     
@@ -340,7 +340,39 @@ def chat():
         print("Start choosen game mode")
 
         print("Out of Start mode")
-        game_mode = True
+        game_mode = start_commands[choosen_key]
+
+        text = start_commands[choosen_key]
+        print("Writing start command:", text)
+
+        # Split the text into words
+        words = text.split()
+        time.sleep(1)
+        for word in words:
+            input = f"adb shell input text {word}"
+            send_shell_command(input)
+            send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
+
+        print("Sending start command")
+        send_shell_command("adb shell input tap 1000 1400")  # tap the send button
+
+        time.sleep(2)
+
+        print("Reading the response")
+        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+        send_shell_command("adb shell input tap 700 1400")
+    elif game_mode == "test psychologiczny":
+
+        print("Sending Tak/Nie/Nie wiem/Wyjście")
+        text = test_commands_pl[choosen_key]
+        send_shell_command(text)
+        send_shell_command("adb shell input tap 1000 1400")  # tap the send button
+
+        time.sleep(2)
+
+        print("Reading the response")
+        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+        send_shell_command("adb shell input tap 700 1400")
 
     
 def send_shell_command(command):

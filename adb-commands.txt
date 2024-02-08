@@ -25,3 +25,6 @@
 # adb shell input touchscreen swipe <x1> <y1> <x2> <y2> <duration>
 # adb shell input touchscreen swipe 500 650 500 650 1000
 # adb shell input tap 700 1400
+
+
+# adb shell am start -n com.openai.chatgpt/.MainActivity
