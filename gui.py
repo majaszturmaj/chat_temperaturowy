@@ -274,6 +274,7 @@ def check_temperatures():
     print("Checking temperatures - THREAD STARTED")
     while True:
         prev_temperatures = copy.deepcopy(temperatures)
+        outlier_group = {}
         time.sleep(5)
         print("Checking temperatures................................................................")
         print()
@@ -300,7 +301,6 @@ def check_temperatures():
         if len(outlier_group) != 0:
             max_temp_key = max(outlier_group, key=outlier_group.get)
             chat()
-            outlier_group = {}
 
         # # When a new temperature is available, put it in the queue
         # new_temperature = get_new_temperature()
@@ -317,7 +317,8 @@ active_robot_images = {1: "assets/friendlyrobotassistantwaving.png",
 def chat():
     # Start the update_image function in a new thread
     print("Start update_image function in a new thread")
-    update_image_thread.start()
+    if not update_image_thread.is_alive():
+        update_image_thread.start()
     # threading.Thread(target=update_image, daemon=True).start()
     pass
 
