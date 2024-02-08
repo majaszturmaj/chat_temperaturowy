@@ -327,18 +327,25 @@ quiz_commands = {"1d": "A",
                  "56": "Wyjście",}
 
 game_mode = False
+coordinate = 0
 
 def chat(choosen_key):
     global game_mode
+    global coordinate
     print("Start update_image function in a thread")
     stop_update_image_flag.clear()
+
+    touch_coordinates = [[(500, 650), (700, 1400)], # first response
+                         [(500, 1030), (700, 1800)], # second response
+                         [(500, 1415), (600, 1440)], # third response
+                         [(500, 1920), (700, 1885)]] # rest of the responses
 
     if game_mode == False:
         stop_update_image_flag.clear()
         print("Open ChatGPT application")
         send_shell_command("adb shell am start -n com.openai.chatgpt/.MainActivity")
 
-        print("Start choosen game mode")
+        coordinate = 0
 
         print("Out of Start mode")
         game_mode = start_commands[choosen_key]
@@ -348,7 +355,7 @@ def chat(choosen_key):
 
         # Split the text into words
         words = text.split()
-        time.sleep(1)
+        time.sleep(2)
         for word in words:
             input = f"adb shell input text {word}"
             print(input)
@@ -363,13 +370,6 @@ def chat(choosen_key):
         print("Reading the response")
         send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
         send_shell_command("adb shell input tap 700 1400")
-
-    elif game_mode == True:
-        send_shell_command("adb shell input tap 500 2200") # tap the text field
-        if choosen_key == "56":
-            game_mode = False
-            stop_update_image_flag.set()
-            send_shell_command("adb shell am force-stop com.openai.chatgpt")
 
     elif game_mode == "test psychologiczny":
 
@@ -386,18 +386,25 @@ def chat(choosen_key):
         else:
             words = text.split()
             send_shell_command("adb shell input tap 500 2200") # tap the text field
-            time.sleep(1)
             for word in words:
                 input = f"adb shell input text {word}"
                 print(input)
                 send_shell_command(input)
                 send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
 
-            send_shell_command("adb shell input tap 1000 1400")  # tap the send button
+            time.sleep(1)
+            send_shell_command("adb shell input tap 945 1430")  # tap the send button
+
+            if coordinate < 3:
+                coordinate += 1
+                
             time.sleep(2)
-            print("Reading the response once again")
-            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-            send_shell_command("adb shell input tap 700 1400")
+            print("Reading the response")
+            long_touch = " adb shell input touchscreen swipe " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " 1000"
+            send_shell_command(long_touch)
+            read_response = "adb shell input tap " + str(touch_coordinates[coordinate][1][0]) + " " + str(touch_coordinates[coordinate][1][1])
+            send_shell_command(read_response)
+            
     
         if choosen_key == "56":
             game_mode = False
@@ -419,19 +426,24 @@ def chat(choosen_key):
             send_shell_command("adb shell input tap 700 1400")
         else:
             words = text.split()
-            time.sleep(1)
             send_shell_command("adb shell input tap 500 2200") # tap the text field
             for word in words:
                 input = f"adb shell input text {word}"
                 print(input)
                 send_shell_command(input)
                 send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
+               
+            time.sleep(1)
+            send_shell_command("adb shell input tap 945 1430")
 
-            send_shell_command("adb shell input tap 1000 1400")
             time.sleep(2)
             print("Reading the response")
-            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-            send_shell_command("adb shell input tap 700 1400")
+            long_touch = " adb shell input touchscreen swipe " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " 1000"
+            send_shell_command(long_touch)
+            read_response = "adb shell input tap " + str(touch_coordinates[coordinate][1][0]) + " " + str(touch_coordinates[coordinate][1][1])
+            send_shell_command(read_response)
+            if coordinate < 3:
+                coordinate += 1
 
         if choosen_key == "56":
             game_mode = False
@@ -452,19 +464,24 @@ def chat(choosen_key):
             send_shell_command("adb shell input tap 700 1400")
         else:
             words = text.split()
-            time.sleep(1)
             send_shell_command("adb shell input tap 500 2200") # tap the text field
             for word in words:
                 input = f"adb shell input text {word}"
                 print(input)
                 send_shell_command(input)
-                send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
+            
+            time.sleep(1)
+            send_shell_command("adb shell input tap 945 1430") # tap the send button
 
-            send_shell_command("adb shell input tap 1000 1400")
             time.sleep(2)
             print("Reading the response")
-            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-            send_shell_command("adb shell input tap 700 1400")
+            long_touch = " adb shell input touchscreen swipe " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " " + str(touch_coordinates[coordinate][0][0]) + " " + str(touch_coordinates[coordinate][0][1]) + " 1000"
+            send_shell_command(long_touch)
+            read_response = "adb shell input tap " + str(touch_coordinates[coordinate][1][0]) + " " + str(touch_coordinates[coordinate][1][1])
+            send_shell_command(read_response)
+            if coordinate < 3:
+                coordinate += 1
+            print("Coordinate:", coordinate)
 
         if choosen_key == "56":
             game_mode = False
@@ -519,5 +536,6 @@ check_temp_thread.start()
 stop_update_image_flag = threading.Event()
 stop_update_image_flag.set()
 update_image_thread = threading.Thread(target=update_image, daemon=True).start()
+send_shell_command("adb shell am force-stop com.openai.chatgpt")
 
 window.mainloop()
