@@ -11,6 +11,7 @@ from tkinter import Entry
 from tkinter import Text
 from tkinter import Button
 from tkinter import PhotoImage
+import subprocess
 
 app = Flask(__name__)
 app.debug = False
@@ -289,22 +290,69 @@ def check_temperatures():
             # Convert prev_temp to float
             prev_temp = float(prev_temperatures[key])
 
-
             print(temp, "                            ", prev_temp)
 
-            if temp > prev_temp + 0.5:
-            # if temp > prev_temperatures[i] + 0.5:  # check if the temperature is an outlier
+            if temp > prev_temp + 0.5: # check if the temperature is an outlier
                 temp_rise = temp - prev_temp
                 outlier_group[key] = temp_rise
                 print("OUTLIERS:", outlier_group)
                 
         if len(outlier_group) != 0:
             max_temp_key = max(outlier_group, key=outlier_group.get)
+            print("MAX TEMP KEY:", max_temp_key)
             chat()
+    
+start_commands = {"1d": "test psychologiczny",
+                  "b7": "quiz o informatyce",
+                  "d5": "quiz o robotach",
+                  "fd": "quiz o programowaniu",
+                  "a5": "quiz o sztucznej inteligencji",
+                  "56": "test psychologiczny w języku angielskim"}
 
-        # # When a new temperature is available, put it in the queue
-        # new_temperature = get_new_temperature()
-        # new_temperatures.put(new_temperature)
+test_commands_pl = {"1d": "Tak",
+                    "b7": "Nie",
+                    "d5": "Nie wiem",
+                    "56": "Wyjście"}
+
+test_commands_eng = {"1d": "Yes",
+                     "b7": "No",
+                     "d5": "I don't know",
+                     "56": "Exit"}
+
+quiz_commands = {"1d": "A",
+                 "d5": "B",
+                 "a5": "C",
+                 "56": "Wyjście",}
+
+game_mode = False
+
+def chat():
+    global game_mode
+    print("Start update_image function in a new thread")
+    
+
+    if game_mode == False:
+        if not update_image_thread.is_alive():
+            update_image_thread.start()
+        print("Open ChatGPT application")
+        send_shell_command("adb shell am start -n com.openai.chatgpt/.MainActivity")
+
+        print("Start choosen game mode")
+
+        print("Out of Start mode")
+        game_mode = True
+
+    
+def send_shell_command(command):
+    print("Executing command:", command)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    
+    # Print the output
+    print("Output:", result.stdout.strip())
+
+    # Print any errors
+    if result.stderr:
+        print("Errors:", result.stderr.strip())
     
 
 active_robot_images = {1: "assets/friendlyrobotassistantwaving.png",
@@ -313,14 +361,6 @@ active_robot_images = {1: "assets/friendlyrobotassistantwaving.png",
                        4: "assets/robotassistantsad.png",
                        5: "assets/robotassistantstandingandlooking.png"}
 
-
-def chat():
-    # Start the update_image function in a new thread
-    print("Start update_image function in a new thread")
-    if not update_image_thread.is_alive():
-        update_image_thread.start()
-    # threading.Thread(target=update_image, daemon=True).start()
-    pass
 
 def update_image():
     while True:
@@ -346,8 +386,4 @@ check_temp_thread.start()
 # Start the image update thread
 update_image_thread = threading.Thread(target=update_image, daemon=True)
 
-
-
-# window_thread = threading.Thread(target=window.mainloop, daemon=True)
-# window_thread.start()
 window.mainloop()
