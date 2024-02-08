@@ -380,6 +380,9 @@ def chat(choosen_key):
         except KeyError:
             # Handle the exception if the key is not in the dictionary
             print("Invalid option. Please choose a valid key.")
+            print("Reading the response once again")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
         else:
             words = text.split()
             send_shell_command("adb shell input tap 500 2200") # tap the text field
@@ -392,11 +395,9 @@ def chat(choosen_key):
 
             send_shell_command("adb shell input tap 1000 1400")  # tap the send button
             time.sleep(2)
-        
-
-        print("Reading the response")
-        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-        send_shell_command("adb shell input tap 700 1400")
+            print("Reading the response once again")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
     
         if choosen_key == "56":
             game_mode = False
@@ -413,6 +414,9 @@ def chat(choosen_key):
         except KeyError:
             # Handle the exception if the key is not in the dictionary
             print("Invalid option. Please choose a valid key.")
+            print("Reading the response once again")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
         else:
             words = text.split()
             time.sleep(1)
@@ -425,10 +429,9 @@ def chat(choosen_key):
 
             send_shell_command("adb shell input tap 1000 1400")
             time.sleep(2)
-
-        print("Reading the response")
-        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-        send_shell_command("adb shell input tap 700 1400")
+            print("Reading the response")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
 
         if choosen_key == "56":
             game_mode = False
@@ -444,6 +447,9 @@ def chat(choosen_key):
         except KeyError:
             # Handle the exception if the key is not in the dictionary
             print("Invalid option. Please choose a valid key.")
+            print("Reading the response once again")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
         else:
             words = text.split()
             time.sleep(1)
@@ -456,10 +462,9 @@ def chat(choosen_key):
 
             send_shell_command("adb shell input tap 1000 1400")
             time.sleep(2)
-
-        print("Reading the response")
-        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
-        send_shell_command("adb shell input tap 700 1400")
+            print("Reading the response")
+            send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+            send_shell_command("adb shell input tap 700 1400")
 
         if choosen_key == "56":
             game_mode = False
@@ -513,6 +518,6 @@ check_temp_thread.start()
 # Define a flag to control the thread
 stop_update_image_flag = threading.Event()
 stop_update_image_flag.set()
-update_image_thread = threading.Thread(target=update_image, daemon=True)
+update_image_thread = threading.Thread(target=update_image, daemon=True).start()
 
 window.mainloop()
