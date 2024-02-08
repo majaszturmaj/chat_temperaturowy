@@ -27,4 +27,5 @@
 # adb shell input tap 700 1400
 
 
-# adb shell am start -n com.openai.chatgpt/.MainActivity
+# adb shell am force-stop com.openai.chatgpt
+

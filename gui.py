@@ -272,6 +272,7 @@ window.title("Chat temperaturowy")
 
 outlier_group = {}
 def check_temperatures():
+    time.sleep(10) # Wait for admin to start sending data
     print("Checking temperatures - THREAD STARTED")
     while True:
         prev_temperatures = copy.deepcopy(temperatures)
@@ -300,6 +301,7 @@ def check_temperatures():
         if len(outlier_group) != 0:
             max_temp_key = max(outlier_group, key=outlier_group.get)
             print("MAX TEMP KEY:", max_temp_key)
+            outlier_group = {}
             chat(max_temp_key)
     
 start_commands = {"1d": "test psychologiczny",
@@ -328,12 +330,11 @@ game_mode = False
 
 def chat(choosen_key):
     global game_mode
-    print("Start update_image function in a new thread")
-    
+    print("Start update_image function in a thread")
+    stop_update_image_flag.clear()
 
     if game_mode == False:
-        if not update_image_thread.is_alive():
-            update_image_thread.start()
+        stop_update_image_flag.clear()
         print("Open ChatGPT application")
         send_shell_command("adb shell am start -n com.openai.chatgpt/.MainActivity")
 
@@ -350,6 +351,7 @@ def chat(choosen_key):
         time.sleep(1)
         for word in words:
             input = f"adb shell input text {word}"
+            print(input)
             send_shell_command(input)
             send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
 
@@ -361,20 +363,112 @@ def chat(choosen_key):
         print("Reading the response")
         send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
         send_shell_command("adb shell input tap 700 1400")
+
+    elif game_mode == True:
+        send_shell_command("adb shell input tap 500 2200") # tap the text field
+        if choosen_key == "56":
+            game_mode = False
+            stop_update_image_flag.set()
+            send_shell_command("adb shell am force-stop com.openai.chatgpt")
+
     elif game_mode == "test psychologiczny":
 
         print("Sending Tak/Nie/Nie wiem/Wyjście")
-        text = test_commands_pl[choosen_key]
-        send_shell_command(text)
-        send_shell_command("adb shell input tap 1000 1400")  # tap the send button
+        try:
+            # Attempt to get the command
+            text = test_commands_pl[choosen_key]
+        except KeyError:
+            # Handle the exception if the key is not in the dictionary
+            print("Invalid option. Please choose a valid key.")
+        else:
+            words = text.split()
+            send_shell_command("adb shell input tap 500 2200") # tap the text field
+            time.sleep(1)
+            for word in words:
+                input = f"adb shell input text {word}"
+                print(input)
+                send_shell_command(input)
+                send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
 
-        time.sleep(2)
+            send_shell_command("adb shell input tap 1000 1400")  # tap the send button
+            time.sleep(2)
+        
+
+        print("Reading the response")
+        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+        send_shell_command("adb shell input tap 700 1400")
+    
+        if choosen_key == "56":
+            game_mode = False
+            stop_update_image_flag.set()
+            send_shell_command("adb shell am force-stop com.openai.chatgpt")
+
+    elif game_mode == "test psychologiczny w języku angielskim":
+
+        
+        print("Sending Yes/No/I don't know/Exit")
+        try:
+            # Attempt to get the command
+            text = test_commands_eng[choosen_key]
+        except KeyError:
+            # Handle the exception if the key is not in the dictionary
+            print("Invalid option. Please choose a valid key.")
+        else:
+            words = text.split()
+            time.sleep(1)
+            send_shell_command("adb shell input tap 500 2200") # tap the text field
+            for word in words:
+                input = f"adb shell input text {word}"
+                print(input)
+                send_shell_command(input)
+                send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
+
+            send_shell_command("adb shell input tap 1000 1400")
+            time.sleep(2)
 
         print("Reading the response")
         send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
         send_shell_command("adb shell input tap 700 1400")
 
+        if choosen_key == "56":
+            game_mode = False
+            stop_update_image_flag.set()
+            send_shell_command("adb shell am force-stop com.openai.chatgpt")
     
+    elif game_mode == "quiz o informatyce" or game_mode == "quiz o robotach" or game_mode == "quiz o programowaniu" or game_mode == "quiz o sztucznej inteligencji":
+
+        print("Sending A/B/C/Wyjście")
+        try:
+            # Attempt to get the command
+            text = quiz_commands[choosen_key]
+        except KeyError:
+            # Handle the exception if the key is not in the dictionary
+            print("Invalid option. Please choose a valid key.")
+        else:
+            words = text.split()
+            time.sleep(1)
+            send_shell_command("adb shell input tap 500 2200") # tap the text field
+            for word in words:
+                input = f"adb shell input text {word}"
+                print(input)
+                send_shell_command(input)
+                send_shell_command("adb shell input keyevent 62")  # 62 is the key code for the space key
+
+            send_shell_command("adb shell input tap 1000 1400")
+            time.sleep(2)
+
+        print("Reading the response")
+        send_shell_command("adb shell input touchscreen swipe 500 650 500 650 1000")
+        send_shell_command("adb shell input tap 700 1400")
+
+        if choosen_key == "56":
+            game_mode = False
+            stop_update_image_flag.set()
+            send_shell_command("adb shell am force-stop com.openai.chatgpt")
+
+    text = None
+    print("End of chat function")
+
 def send_shell_command(command):
     print("Executing command:", command)
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -395,7 +489,7 @@ active_robot_images = {1: "assets/friendlyrobotassistantwaving.png",
 
 
 def update_image():
-    while True:
+    while not stop_update_image_flag.is_set():
         # Choose a random image
         new_image_path = random.choice(list(active_robot_images.values()))
         new_image = PhotoImage(file=new_image_path)
@@ -415,7 +509,10 @@ print("Here the background thread starts")
 check_temp_thread = threading.Thread(target=check_temperatures, daemon=True)
 check_temp_thread.start()
 
-# Start the image update thread
+# the image update thread
+# Define a flag to control the thread
+stop_update_image_flag = threading.Event()
+stop_update_image_flag.set()
 update_image_thread = threading.Thread(target=update_image, daemon=True)
 
 window.mainloop()
