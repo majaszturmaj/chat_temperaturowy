@@ -273,15 +273,29 @@ outlier_group = {}
 def check_temperatures():
     print("Checking temperatures - THREAD STARTED")
     while True:
-        time.sleep(5)
-        print("Checking temperatures")
         prev_temperatures = copy.deepcopy(temperatures)
+        time.sleep(5)
+        print("Checking temperatures................................................................")
+        print()
+        print(prev_temperatures)
+        print(temperatures)
+        print()
+        for key, temp in temperatures.items():
+            # Convert temp to float
+            temp = float(temp)
 
-        for i, temp in enumerate(temperatures):
-            if temp > prev_temperatures[i] + 0.5:  # check if the temperature is an outlier
-                temp_rise = temp - prev_temperatures[i]
-                outlier_group[i] = temp_rise
-                print(outlier_group)
+            # Use dict.get() to provide a default value if the key does not exist
+            # Convert prev_temp to float
+            prev_temp = float(prev_temperatures[key])
+
+
+            print(temp, "                            ", prev_temp)
+
+            if temp > prev_temp + 0.5:
+            # if temp > prev_temperatures[i] + 0.5:  # check if the temperature is an outlier
+                temp_rise = temp - prev_temp
+                outlier_group[key] = temp_rise
+                print("OUTLIERS:", outlier_group)
                 
         if len(outlier_group) != 0:
             max_temp_key = max(outlier_group, key=outlier_group.get)
@@ -302,19 +316,20 @@ active_robot_images = {1: "assets/friendlyrobotassistantwaving.png",
 
 def chat():
     # Start the update_image function in a new thread
-    # print("Start update_image function in a new thread")
+    print("Start update_image function in a new thread")
+    update_image_thread.start()
     # threading.Thread(target=update_image, daemon=True).start()
     pass
 
 def update_image():
     while True:
         # Choose a random image
-        new_image_path = random.choice(active_robot_images.values())
+        new_image_path = random.choice(list(active_robot_images.values()))
         new_image = PhotoImage(file=new_image_path)
         print("Random image chosen")
 
         # Update the image on the canvas using after() to schedule the update on the main thread
-        canvas.after(0, canvas.itemconfig, image_id, image=new_image)
+        canvas.after(0, lambda: canvas.itemconfig(image_id, image=new_image))
         print("Image updated")
 
         # Wait for a random interval between 3 and 6 seconds
@@ -329,7 +344,7 @@ check_temp_thread.start()
 
 # Start the image update thread
 update_image_thread = threading.Thread(target=update_image, daemon=True)
-update_image_thread.start()
+
 
 
 # window_thread = threading.Thread(target=window.mainloop, daemon=True)
