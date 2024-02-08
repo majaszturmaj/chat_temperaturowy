@@ -1,0 +1,27 @@
+# scrcpy --no-video
+
+### ADB SHELLL COMMANDS ###
+
+# adb shell am start -n com.openai.chatgpt/.MainActivity
+# # Define the text string
+# text="Your entire text here"
+
+# # Loop through each word in the text string
+# for word in text:
+#     # Input each word into the text field
+#     adb shell input text "{word}"
+#     # Simulate pressing the space key to input a space between words
+#     adb shell input keyevent 62  # 62 is the key code for the space key
+
+# adb shell input keyevent 66  # 66 is the key code for the Enter key
+
+# click send button
+# adb shell input tap 1000 1400
+
+# scroll to the bottom of chat
+# adb shell input touchscreen swipe 500 1650 500 250 1000
+
+# long press
+# adb shell input touchscreen swipe <x1> <y1> <x2> <y2> <duration>
+# adb shell input touchscreen swipe 500 650 500 650 1000
+# adb shell input tap 700 1400
